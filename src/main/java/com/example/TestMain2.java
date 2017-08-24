@@ -28,7 +28,6 @@ public class TestMain2 {
 	
 	
 	public static void main(String[] args) throws Exception {
-		Collection<E>
 		
 		System.setProperty("webdriver.chrome.driver", "F:/chromedriver_new.exe");
 		WebDriver driver = new ChromeDriver();

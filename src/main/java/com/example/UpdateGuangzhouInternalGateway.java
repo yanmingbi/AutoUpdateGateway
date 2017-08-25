@@ -33,7 +33,6 @@ public class UpdateGuangzhouInternalGateway {
 	/**
 	 * updateInternal
 	 * @Title: updateInternal
-	 * @Description: TODO
 	 * @param @throws
 	 *            InterruptedException
 	 * @return void
@@ -53,7 +52,7 @@ public class UpdateGuangzhouInternalGateway {
 		//////////// --首页登陆
 
 		///////////等待登录成功，寻找目标应用
-		WebDriverWait secondWait = new WebDriverWait(driver, 20);
+		WebDriverWait secondWait = new WebDriverWait(driver,60);
 		secondWait.until(
 				ExpectedConditions.presenceOfElementLocated(By.xpath("/html/body/div/aside/div/nav/ul/li[5]/a")));
 		WebElement appManager = driver.findElement(By.xpath("/html/body/div/aside/div/nav/ul/li[5]/a"));
@@ -250,6 +249,7 @@ public class UpdateGuangzhouInternalGateway {
 		Thread.sleep(2000);
 		overTemp.click();
 		// ////////////////// --添加具体负载内容
+		//等待负载更新完成
 		Thread.sleep(5000);
 
 		///////////////////// 更新外部网络

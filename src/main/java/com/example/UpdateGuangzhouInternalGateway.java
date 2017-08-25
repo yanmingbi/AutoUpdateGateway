@@ -371,7 +371,6 @@ public class UpdateGuangzhouInternalGateway {
 	/**
 	 * 查询符合by条件的所有标签
 	 * @Title: identicalConditionfindElement
-	 * @Description: TODO
 	 * @param driver
 	 * @param by 查询条件
 	 * @param targetCount 符合by条件的标签目标数量，如查询得到的数量与目标数量不同，则再次获取

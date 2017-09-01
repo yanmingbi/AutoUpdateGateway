@@ -14,16 +14,15 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class UpdateGuangzhouInternalGateway {
-
-	// 内网网关的xpath，也就是搜索结果的第一个
+	// the xpath of internal gateway, i.e. the first search result.
 	public static final String GATEWAY_INTERNAL_XPATH = "//*[@id=\"applisttable\"]/tbody/tr[1]/td[2]/a";
-	// 待更新平台
+	// to-update platform
 	public static final String GUANGZHOU = "http://101.200.52.215:5085/cloudui/app/pages/login.html";
-	// 应用状态的XPATH值
+	// the xpath of application status
 	public static final String STATE_XPATH = "/html/body/div[1]/section/div/div[2]/div/div/div[1]/div[2]/p[1]";
-	// 外网网关名称
+	// outer gateway name
 	public static final String GATEWAY_HOST_NAME = "gateway_host";
-	// 内网网关名称
+	// internal gateway name
 	public static final String GATEWAY_INTERNAL_NAME = "20170103gateway";
 
 	public static void main(String[] args) throws Exception {
@@ -32,6 +31,7 @@ public class UpdateGuangzhouInternalGateway {
 
 	/**
 	 * updateInternal
+	 * 
 	 * @Title: updateInternal
 	 * @param @throws
 	 *            InterruptedException
@@ -41,7 +41,7 @@ public class UpdateGuangzhouInternalGateway {
 		System.setProperty("webdriver.chrome.driver", "F:/chromedriver_new.exe");
 		WebDriver driver = new ChromeDriver();
 		driver.manage().window().maximize();
-		//////////// 首页登陆
+		//////////// log in index page
 		driver.get(GUANGZHOU);
 		WebElement userNameElement = driver.findElement(By.id("exampleInputEmail1"));
 		userNameElement.sendKeys("admin");
@@ -49,10 +49,10 @@ public class UpdateGuangzhouInternalGateway {
 		passwordElement.sendKeys("111111");
 		WebElement button = driver.findElement(By.xpath("/html/body/div[2]/section/form/button"));
 		button.click();
-		//////////// --首页登陆
+		//////////// --log in index page
 
-		///////////等待登录成功，寻找目标应用
-		WebDriverWait secondWait = new WebDriverWait(driver,60);
+		/////////// wait logging in, when success, to find target app
+		WebDriverWait secondWait = new WebDriverWait(driver, 60);
 		secondWait.until(
 				ExpectedConditions.presenceOfElementLocated(By.xpath("/html/body/div/aside/div/nav/ul/li[5]/a")));
 		WebElement appManager = driver.findElement(By.xpath("/html/body/div/aside/div/nav/ul/li[5]/a"));
@@ -60,96 +60,96 @@ public class UpdateGuangzhouInternalGateway {
 		Thread.sleep(1000);
 		WebElement inputElement = driver.findElement(By.xpath("/html/body/div/section/div/div[2]/input"));
 		inputElement.sendKeys(GATEWAY_INTERNAL_NAME);
-		//按键盘键
+		// press keyboard
 		inputElement.sendKeys(Keys.ENTER);
 		Thread.sleep(500);
-		///////////--等待登录成功，寻找目标应用
-		
-		/////////// 进入待更新网关
+		/////////// --wait logging in, when success, to find target app
+
+		/////////// enter to-update gateway
 		WebElement gatewayElement = driver.findElement(By.xpath(GATEWAY_INTERNAL_XPATH));
 		gatewayElement.click();
-		//等待内网网关应用完全加载
+		// waiting for load complete of internal gateway
 		Thread.sleep(2000);
 		WebElement appState = driver.findElement(By.xpath(STATE_XPATH));
-		//////////--进入待更新网关
-		
-		
-		
-		// 获取实例数量
+		////////// --enter to-update gateway
+
+		// get instance amount
 		List<WebElement> list = driver
 				.findElements(By.cssSelector("tr > td:nth-child(4) > button.btn.btn-info.btn-sm"));
 		int oCount = list.size();
-		System.out.println("当前页面实例数量为" + oCount);
+		System.out.println("the instance amount of this page" + oCount);
 
 		int tempoCount = oCount + 1;
-		//页面编号框
+		// number input box
 		WebElement objectCount = driver
 				.findElement(By.xpath("/html/body/div[1]/section/div/div[3]/div[2]/table/tbody/tr[" + tempoCount
 						+ "]/td/page/div/div[1]/input"));
 		if (!objectCount.getAttribute("max").equals("1")) {
-			System.out.println("实例页数不为1，请清理");
+			System.out.println("amount of instance greater than 1,please clean");
 			return;
 		}
 
 		if (appState.getText().equals("应用状态：RUNNING")) {
-			// 停止键
+			// stop button
 			WebElement stopElement = driver
 					.findElement(By.xpath("/html/body/div[1]/section/div/div[2]/div/div/div[2]/div[1]/button[4]"));
 			stopElement.click();
-			//死循环等待浮动框消失
+			// waiting for floating frame in this endless loop
 			while (true) {
 				if (appState.getText().equals("应用状态：DEPLOYED")) {
-					// 等待两秒，等待浮动框消失
+					// wait two seconds for floating frame termination
 					Thread.sleep(2000);
 					break;
 				}
 				Thread.sleep(500);
 			}
 		} else {
-			System.out.println("应用非RUNNING状态，无法停止");
+			System.out.println("the app status not \"RUNNING\", could not stop.");
 			return;
 		}
 
 		if (appState.getText().equals("应用状态：DEPLOYED")) {
-			// 卸载
+			// uninstall
 			WebElement downElement = driver
 					.findElement(By.xpath("/html/body/div[1]/section/div/div[2]/div/div/div[2]/div[1]/button[1]"));
 			downElement.click();
 			while (true) {
 				if (appState.getText().equals("应用状态：FREE")) {
-					// 等待两秒，等待浮动框消失
+					// wait two seconds for floating frame termination
 					Thread.sleep(2000);
 					break;
 				}
 				Thread.sleep(500);
 			}
 		} else {
-			System.out.println("应用非DEPLOYED状态，无法卸载");
+			System.out.println("the app status not \"DEPLOYED\", could not uninstall.");
 			return;
 		}
 
-		// 进入更新页面
+		// enter "update page"
 		WebElement updateElement = driver
 				.findElement(By.xpath("/html/body/div[1]/section/div/div[2]/div/div/div[2]/div[1]/a"));
 		updateElement.click();
 		Thread.sleep(1000);
 		WebElement typeList = driver
 				.findElement(By.xpath("//*[@id=\"formValidate\"]/div/div[1]/fieldset[6]/div/div/select"));
-		// 将元素转换为 Select
+		// convert element to Select
 		Select gtl = new Select(typeList);
-		// 选择最后一项
+		// select the last one
 		gtl.getOptions().get(gtl.getOptions().size() - 1).click();
-		// 暂停一下，观察是否选择了正确版本
+		// pause selenium, I can inspect whether it selected the right image
+		// version
 		Thread.sleep(3000);
-		// 更新应用
+		// update app
 		WebElement updateClick = driver.findElement(By.xpath("//*[@id=\"formValidate\"]/div/div[5]/button"));
 		updateClick.click();
 		Thread.sleep(1000);
-		// 部署
+		// deploy app
 		int tempCount = 0;
 		while (true) {
 			try {
-				// XPath取不到，因此使用css选择器找元素
+				// use Xpath method could not find target element, so use css
+				// selector method
 				// WebElement putClick = driver
 				// .findElement(By.xpath("/html/body/div/section/div/div[3]/div[2]/table/tbody/tr["
 				// + tempListSize
@@ -157,11 +157,11 @@ public class UpdateGuangzhouInternalGateway {
 				//
 				List<WebElement> putList = driver.findElements(By.cssSelector(".btn.btn-info.btn-sm"));
 				System.out.println(putList.size());
-				//点击最后一项
+				// select the last one
 				putList.get(putList.size() - 1).click();
 				break;
 			} catch (NoSuchElementException e) {
-				System.out.println("第" + tempCount + "次查找失败");
+				System.out.println("the " + tempCount + "count, find fail");
 				tempCount++;
 			}
 		} // while(true)
@@ -173,11 +173,11 @@ public class UpdateGuangzhouInternalGateway {
 				alertList.get(i).click();
 			}
 		}
-		
+
 		while (true) {
 			try {
 				if (appState.getText().equals("应用状态：DEPLOYED")) {
-					// 等待两秒，等待浮动框完全消失
+					// wait two seconds for floating frame termination
 					Thread.sleep(2000);
 					break;
 				}
@@ -185,21 +185,20 @@ public class UpdateGuangzhouInternalGateway {
 				// org.openqa.selenium.StaleElementReferenceException: stale
 				// element reference: element is not attached to the page
 				// document
-				// 可能报如上异常，需重新获取
+				//if selenium catch exception above, it need find again
 				appState = driver.findElement(By.xpath(STATE_XPATH));
 			}
 			Thread.sleep(500);
 		}
 		Thread.sleep(1000);
-		
-		
-		// 启动应用
+
+		// start app
 		WebElement startElement = driver
 				.findElement(By.xpath("/html/body/div[1]/section/div/div[2]/div/div/div[2]/div[1]/button[5]"));
 		startElement.click();
 		while (true) {
 			if (appState.getText().equals("应用状态：RUNNING")) {
-				// 等待两秒，等待浮动框消失
+				// wait two seconds for floating frame termination
 				Thread.sleep(2000);
 				break;
 			}
@@ -207,7 +206,7 @@ public class UpdateGuangzhouInternalGateway {
 		}
 		Thread.sleep(1000);
 
-		// 创建负载
+		// create loadbalance
 		WebElement lbElement = driver.findElement(By.xpath("/html/body/div[1]/section/div/div[3]/div[1]/a[6]"));
 		lbElement.click();
 		Thread.sleep(2000);
@@ -224,7 +223,7 @@ public class UpdateGuangzhouInternalGateway {
 		createElement2.click();
 		Thread.sleep(1000);
 
-		////////////////// 添加具体负载内容
+		////////////////// add specific lb context
 		List<WebElement> webElements = findAllSameElement(driver,
 				By.cssSelector(".form-control.ng-pristine.ng-untouched.ng-valid"), 6);
 		webElements.get(2).sendKeys("mscx-gateway.hanlnk.com");
@@ -244,18 +243,18 @@ public class UpdateGuangzhouInternalGateway {
 				By.cssSelector(".form-control.ng-pristine.ng-untouched.ng-invalid.ng-invalid-required"), 2);
 		webElements3.get(0).sendKeys("gateway-web-1.8.0/");
 		webElements3.get(1).sendKeys("/");
-		// 创建按钮
+		// "create" button
 		WebElement overTemp = driver.findElement(By.xpath("/html/body/div[3]/div[2]/div[3]/button[1]"));
 		Thread.sleep(2000);
 		overTemp.click();
-		// ////////////////// --添加具体负载内容
-		//等待负载更新完成
+		// ////////////////// --add specific lb context
+		// waiting for the finish of lb update
 		Thread.sleep(5000);
 
-		///////////////////// 更新外部网络
+		///////////////////// update outer network
 		WebElement outerNetwork = driver.findElement(By.xpath("/html/body/div[1]/section/div/div[3]/div[1]/a[8]"));
 		outerNetwork.click();
-		// 等待外部网络面板加载完毕
+		// waiting for the finish of outer network panel load
 		Thread.sleep(2000);
 		WebElement outerNetworkAdd = driver.findElement(By.xpath("/html/body/div[1]/section/div/div[3]/div[2]/form/a"));
 		outerNetworkAdd.click();
@@ -270,13 +269,13 @@ public class UpdateGuangzhouInternalGateway {
 		WebElement createButton = driver
 				.findElement(By.xpath("/html/body/div[1]/section/div/div[3]/div[2]/form/button"));
 		createButton.click();
-		/////////////////// --更新外部网络
+		/////////////////// --update outer network
 		System.exit(0);
 
 	}
 
 	/**
-	 * 已废弃
+	 * outdate
 	 */
 	public static WebElement findElement(WebDriver driver, By by) {
 
@@ -286,7 +285,7 @@ public class UpdateGuangzhouInternalGateway {
 				WebElement webElement = driver.findElement((by));
 				return webElement;
 			} catch (Exception e) {
-				System.out.println("第" + tempCount + "次查找失败");
+				System.out.println("the " + tempCount + "count find fail");
 				tempCount++;
 			}
 			try {
@@ -299,7 +298,7 @@ public class UpdateGuangzhouInternalGateway {
 	}
 
 	/**
-	 * 根据by获取一系列标签，返回value与标签的text相同的元素
+	 * according to a series of tag, this function return the tag which text equals param value.
 	 */
 	public static WebElement findElementByValue(WebDriver driver, By by, String value) {
 		int tempCount = 0;
@@ -312,7 +311,7 @@ public class UpdateGuangzhouInternalGateway {
 					}
 				}
 			} catch (Exception e) {
-				System.out.println("第" + tempCount + "次查找失败");
+				System.out.println("the " + tempCount + "count find fail");
 				tempCount++;
 			}
 			try {
@@ -328,26 +327,27 @@ public class UpdateGuangzhouInternalGateway {
 	 * findElement
 	 * 
 	 * @Title: findElement
-	 * @Description: 根据顺序获取元素值
+	 * @Description: according to order to get element value
 	 * @param driver
 	 * @param by
 	 * @param index
-	 *            待查找元素次序，次序从0开始
+	 *           the target index. first element's index is 0
 	 * @param targetCount
-	 *            最终希望通过findElements()方法查询出的标签的总数量。因有时使用css查询标签可能查不全
+	 *            the expect amount which findElements() final return. Why do I set this parameter? Because sometime
+	 *            selenium could not find out all Elements by using css selector.  
 	 * @param @return
 	 * @return WebElement
 	 */
 	public static WebElement findElementByIndex(WebDriver driver, By by, int index, int targetCount) {
-		// 总查询次数
+		// final search count
 		int totalCount = 0;
-		// 查询1000次
+		// search 1000 times
 		while (totalCount <= 1000) {
 			try {
 				List<WebElement> list = driver.findElements((by));
 				int tempSize = list.size();
 				if (tempSize != targetCount) {
-					System.out.println("查找元素个数不对." + "finalCount: " + targetCount + " queryCount: " + tempSize);
+					System.out.println("the amount wrong. " + "finalCount: " + targetCount + " queryCount: " + tempSize);
 					continue;
 				}
 				for (int i = 0; i < tempSize; i++) {
@@ -356,7 +356,7 @@ public class UpdateGuangzhouInternalGateway {
 					}
 				}
 			} catch (Exception e) {
-				System.out.println("第" + totalCount + "次查找失败");
+				System.out.println("the " + totalCount + " count fail");
 				totalCount++;
 			}
 			try {
@@ -369,22 +369,24 @@ public class UpdateGuangzhouInternalGateway {
 	}
 
 	/**
-	 * 查询符合by条件的所有标签
+	 * find out all tag which could be find out byBy.
 	 * @Title: identicalConditionfindElement
 	 * @param driver
-	 * @param by 查询条件
-	 * @param targetCount 符合by条件的标签目标数量，如查询得到的数量与目标数量不同，则再次获取
+	 * @param by
+	 * 		mechanism used to locate elements within a document. 
+	 * @param targetCount
+	 *            if the amount of driver.findElements() does not equal targetCount, find again.
 	 */
 	public static List<WebElement> findAllSameElement(WebDriver driver, By by, int targetCount) {
-		// 总查询次数
+		// final search count
 		int totalCount = 0;
-		// 查询1000次
+		// search 1000 times
 		while (totalCount <= 1000) {
 			try {
 				List<WebElement> list = driver.findElements((by));
 				int tempSize = list.size();
 				if (tempSize != targetCount) {
-					System.out.println("查找元素个数不对." + "finalCount: " + targetCount + " queryCount: " + tempSize);
+					System.out.println("the count wrong. " + "finalCount: " + targetCount + " queryCount: " + tempSize);
 					continue;
 				}
 				for (int j = 0; j < targetCount; j++) {
@@ -392,7 +394,7 @@ public class UpdateGuangzhouInternalGateway {
 				}
 				return list;
 			} catch (Exception e) {
-				System.out.println("第" + totalCount + "次查找失败");
+				System.out.println("the " + totalCount + " fail");
 				totalCount++;
 			}
 			try {
